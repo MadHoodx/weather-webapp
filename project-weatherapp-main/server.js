@@ -112,6 +112,10 @@ function restoreMongoDB() {
 }
 
 
+let port = process.env,PORT;
+if(port == null || port == ""){
+    port = 3500;
+}
 
 app.listen(3500,() => {
 
