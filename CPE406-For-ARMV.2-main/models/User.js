@@ -10,7 +10,9 @@ const UserSchema = new Schema({
     wind: String,
     percentOfclouds: String,
     humidity: String,
-    nickName: String
+    nickName: String,
+    pressure: String,
+    degreeOfwind: String
 })
 
 UserSchema.pre('save', async function(next) {
