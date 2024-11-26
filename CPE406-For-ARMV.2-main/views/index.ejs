@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <title>Weather Forecast</title>
+    <link href="https://pro.fontawesome.com/releases/v6.0.0-beta3/css/all.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body>
+    <nav>
+        <div class="navdiv">
+                <ul>
+                    <li><a href="">LOGO</a></li>
+                </ul>
+                <div class="weather-input">
+                    <input type="text" id="country_input" placeholder="Enter city name"></input>        
+                    <input type="text" id="name_input" placeholder="Enter your nickname"></input>
+                    <button type="button" id="searchBtn" class="button button4">
+                        <i class="fa-regular fa-search"></i> 
+                    </button>
+</div>
+    </nav>
+    <div class="weather-data">
+        <div class="fill">
+            <h1>Please fill your country in the box</h1>    
+            <div>
+                <p>Computer Engineer CPE406 &copy;</p>
+                </div>  
+        </div>
+		
+</body>
+
+<script>
+
+    const apiKey = "f23b2cab2257ace63600d1793029e0ad";
+    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=London";
+    let coountryInput = document.getElementById('country_input');
+    let searchBtn = document.getElementById('searchBtn');
+
+    
+    currentWeatherCard = document.querySelectorAll('.weather-data')[0];
+    
+    
+    function getWeatherDetails(name, lat, lon, country, state, nickName){
+        let FORECAST_API_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+
+
+        let WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+        days = [
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday'
+        ],
+        months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec'
+        ];
+    
+        
+
+        fetch(WEATHER_API_URL).then(res => res.json()).then(data => {
+            console.log(data);
+            
+            let date = new Date();
+            
+            fetch(FORECAST_API_URL).then((res) => res.json()).then((forecastData) => {
+                console.log(forecastData);
+                let hourlyForecasts = forecastData.list.slice(0, 5);
+
+            fetch(`https://restcountries.com/v3.1/alpha/${country}`).then(res => res.json()).then(countryData => {
+                let flagUrl = countryData[0].flags.png; 
+        
+
+    currentWeatherCard.innerHTML = `
+      <div class="current-weather">
+        <div class="current1">
+          <div class="current2">
+            <div class="details">
+              <div class="cityname">
+                <h2><i class="fa-light fa-location-dot"></i> &nbsp;${name}, ${country} <img src="${flagUrl}" alt="${country} flag" style="height: 1em;"> </h2> 
+                <p><i class="fa-light fa-calendar"></i> &nbsp;${days[date.getDay()]}, 
+                ${date.getDate()}, ${months[date.getMonth()]} ${date.getFullYear()}</p>
+                <h1> ${(data.main.temp - 273.15).toFixed(2)}&deg;</h1>
+              </div>
+              <div class="icon">
+                <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="" width="280" height="280">
+              </div>
+            </div>
+            <div class="forecast">  
+              <p>TODAY'S FORECAST</p>
+              <div class="con-fore">
+                
+                ${hourlyForecasts.map((hourlyForecast, index) => {
+                  let forecastDate = new Date(hourlyForecast.dt * 1000);
+                  let forecastTime = forecastDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                  return `
+                    <div class="forecast-day">
+                      <div class="time">${forecastTime}</div>
+                      <div class="wea-icon"><img src="https://openweathermap.org/img/wn/${hourlyForecast.weather[0].icon}.png" alt=""></div>
+                      <div class="temp-for">${(hourlyForecast.main.temp - 273.15).toFixed(2)}&deg;</div>
+                      ${index < 4 ? '<div class="verline"></div>' : ''} 
+                    </div>
+                  `;
+                }).join("")}
+
+              </div>
+            </div>
+          </div>
+          <div class="current3">
+            <div class="air-con">
+              <h2>AIR CONDITIONS</h2>
+              <div class="four-con">
+                <div class="conditions">
+                  <div class="icon-con"><img src="https://www.freeiconspng.com/thumbs/temperature-icon-png/temperature-icon-png-1.png" alt="" width="30" height="30"></div>
+                  <div class="label"><p>Real feel</p> 
+                  <p1>${(data.main.feels_like - 273.15).toFixed(2)}&deg;</p1> 
+                  </div>
+                </div>
+                <div class="conditions">
+                  <div class="icon-con"><img src="https://icons.veryicon.com/png/o/weather/weather-for-the-first-time/wind-14.png" alt="" width="30" height="30"></div>
+                  <div class="label"><p>Wind</p>
+                  <p1>${(data.wind.speed * 3.6).toFixed(2)} km/hr</p1>  
+                  </div>
+                </div>
+                <div class="conditions">
+                  <div class="icon-con"><img src="https://images.vexels.com/content/240044/preview/rainy-clouds-color-stroke-dffe1c.png" alt=""width="30" height="30"></div>
+                  <div class="label"><p>Percent of Clouds</p>
+                  <p1>${data.clouds.all}%</p1>    
+                  </div>
+                </div>
+                <div class="conditions">
+                  <div class="icon-con"><img src="https://cdn-icons-png.flaticon.com/512/8044/8044378.png" alt=""width="30" height="30"></div>
+                  <div class="label"><p>Humidity</p>
+                  <p1>${data.main.humidity}</p1>      
+                  
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    })  
+})
+  .catch(() => {
+    alert("Failed to fetch forecast weather");
+  });
+            
+            
+                
+                const currentTime = new Date()
+                fetch('/result', {method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    
+                    timestamp: currentTime,
+                    temperature : (data.main.temp - 273.15).toFixed(2),
+                    city : name,
+                    country : country,
+                    wind : (data.wind.speed * 3.6).toFixed(2),
+                    percentOfclouds : data.clouds.all,
+                    humidity : data.main.humidity,
+                    nickName : nickName
+                    
+                
+                })
+            })
+    
+        }).catch((err) => {
+          console.error('Error fetching data:', err);
+          alert('Failed to fetch current weather: ' + err);
+        });
+        
+    };         
+    function getCityCoordinates(){
+       
+        let coountryName = coountryInput.value.trim();
+        coountryName.value = '';
+        let nickName = document.getElementById('name_input').value.trim();
+        if(!coountryName) return;
+        let GEOCODING_API_URL = `http://api.openweathermap.org/geo/1.0/direct?q=${coountryName}&limit=1&appid=${apiKey}`;
+        fetch(GEOCODING_API_URL).then(res => res.json()).then(data =>{
+            
+            console.log(data)
+            
+            let {name, lat, lon, country, state} = data[0];
+            getWeatherDetails(name, lat, lon, country, state,nickName);
+            
+
+            
+        }).catch(() => {
+            alert(`Failed to fetch coordinates of ${coountryName}`);
+        });
+    }
+    
+  
+
+    
+    
+    
+    searchBtn.addEventListener("click", getCityCoordinates);
+    
+    </script>
+</html>
